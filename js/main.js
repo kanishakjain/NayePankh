@@ -126,23 +126,85 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(tick);
   }
 
-  /* ---------- Volunteer / Contact form handling (demo, no backend) ---------- */
-  const volunteerForm = document.getElementById('volunteer-form');
-  if (volunteerForm) {
-    volunteerForm.addEventListener('submit', (e) => {
-      e.preventDefault();
+  /* ---------- Volunteer form: posts to /api/volunteer (Neon DB) ---------- */
+const volunteerForm = document.getElementById('volunteer-form');
+if (volunteerForm) {
+  volunteerForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const submitBtn = volunteerForm.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Submitting...';
+    submitBtn.disabled = true;
+
+    const payload = {
+      name: document.getElementById('v-name').value.trim(),
+      email: document.getElementById('v-email').value.trim(),
+      phone: document.getElementById('v-phone').value.trim(),
+      city: document.getElementById('v-city').value.trim(),
+      program: document.getElementById('v-program').value,
+      availability: document.getElementById('v-availability').value,
+      message: document.getElementById('v-message').value.trim(),
+    };
+
+    try {
+      const res = await fetch('/api/volunteer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || 'Submission failed');
+
       volunteerForm.style.display = 'none';
       document.getElementById('volunteer-success').classList.add('show');
-    });
-  }
+    } catch (err) {
+      console.error('Volunteer submit error:', err);
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+      alert('Something went wrong submitting your application. Please try again.');
+    }
+  });
+}
 
-  const contactForm = document.getElementById('contact-form');
-  if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
-      e.preventDefault();
+/* ---------- Contact form: posts to /api/contact (Neon DB) ---------- */
+const contactForm = document.getElementById('contact-form');
+if (contactForm) {
+  contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const submitBtn = contactForm.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+
+    const payload = {
+      name: document.getElementById('c-name').value.trim(),
+      email: document.getElementById('c-email').value.trim(),
+      subject: document.getElementById('c-subject').value.trim(),
+      message: document.getElementById('c-message').value.trim(),
+    };
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || 'Submission failed');
+
       contactForm.style.display = 'none';
       document.getElementById('contact-success').classList.add('show');
-    });
-  }
+    } catch (err) {
+      console.error('Contact submit error:', err);
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+      alert('Something went wrong sending your message. Please try again.');
+    }
+  });
+        }
 
 });
