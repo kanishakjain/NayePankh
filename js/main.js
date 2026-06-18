@@ -206,5 +206,78 @@ if (contactForm) {
     }
   });
         }
+/* ---------- AI Chat Widget ---------- */
+  const chatBubble = document.getElementById('chat-bubble');
+  const chatWindow = document.getElementById('chat-window');
+  const chatMessages = document.getElementById('chat-messages');
+  const chatForm = document.getElementById('chat-form');
+  const chatInput = document.getElementById('chat-input');
 
+  if (chatBubble && chatWindow && chatForm) {
+    let chatHistory = [];
+
+    chatBubble.addEventListener('click', () => {
+      chatWindow.classList.toggle('open');
+      if (chatWindow.classList.contains('open') && chatMessages.children.length === 0) {
+        addBotMessage("Hi! I'm Pankh, NayePankh's assistant. Ask me about our programs, volunteering, or donating.");
+      }
+    });
+
+    function addMessage(text, sender) {
+      const msg = document.createElement('div');
+      msg.className = `chat-msg ${sender}`;
+      msg.textContent = text;
+      chatMessages.appendChild(msg);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function addBotMessage(text) {
+      addMessage(text, 'bot');
+    }
+
+    function showTyping() {
+      const typing = document.createElement('div');
+      typing.className = 'chat-msg bot typing';
+      typing.id = 'chat-typing';
+      typing.innerHTML = '<span></span><span></span><span></span>';
+      chatMessages.appendChild(typing);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function hideTyping() {
+      const typing = document.getElementById('chat-typing');
+      if (typing) typing.remove();
+    }
+
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      addMessage(text, 'user');
+      chatInput.value = '';
+      showTyping();
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, history: chatHistory }),
+        });
+        const data = await res.json();
+        hideTyping();
+
+        if (!res.ok) throw new Error(data.error || 'Chat failed');
+
+        addBotMessage(data.reply);
+        chatHistory.push({ role: 'user', parts: [{ text }] });
+        chatHistory.push({ role: 'model', parts: [{ text: data.reply }] });
+      } catch (err) {
+        hideTyping();
+        console.error('Chat error:', err);
+        addBotMessage("Sorry, I'm having trouble responding right now. Please try again in a moment.");
+      }
+    });
+  }
+  
 });
