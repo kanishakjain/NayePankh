@@ -923,4 +923,5 @@ body.dark .quote-text { color: var(--color-cream); }
   .footer-grid { grid-template-columns: 1fr; }
   .footer-bottom { flex-direction: column; align-items: flex-start; }
   .hero-stats { gap: 1.4rem; flex-wrap: wrap; }
-}
+   }
+   
