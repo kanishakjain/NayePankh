@@ -5,8 +5,7 @@ A multi-page website built for NayePankh Foundation, a youth-led NGO in Uttar Pr
 Built as a practical project submission covering the **Web Development**, **Vibe Coder**, and **AI Web Development** internship tracks.
 
 ## Live Site
-
-`https://your-deployment-url.vercel.app` *(replace with your actual Vercel URL)*
+`https://naye-pankh-task.vercel.app/` 
 
 ## Tech Stack
 
